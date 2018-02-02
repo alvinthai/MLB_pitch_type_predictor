@@ -90,7 +90,7 @@ class BaseballPitchClassifier(OrderedOVRClassifier):
      research paper: https://arxiv.org/pdf/1705.07874.pdf
 
     Class inherited from OrderedOVRClassifier.
-     source: https://github.com/alvinthai/OrderedOVRClassifier/blob/master/OrderedOVRClassifier/classifier.py
+     source: https://github.com/alvinthai/OrderedOVRClassifier
     '''
     def __init__(self, target=None, model=None, model_fit_params=None,
                  categorical_cols=None):

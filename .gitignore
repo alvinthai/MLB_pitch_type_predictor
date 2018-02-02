@@ -102,3 +102,9 @@ ENV/
 
 # custom files
 .DS_Store
+data/dev.csv
+data/engineered_pitch_data.csv
+data/pitch_by_pitch_metadata.csv
+data/pitches.csv
+data/test.csv
+data/train.csv
