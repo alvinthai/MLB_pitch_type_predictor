@@ -20,8 +20,8 @@ class OneHotLabelGrouper(OneHotLabelEncoder):
      transformed features, and baseline values (mode for categorical features,
      median for numerical features).
 
-    Class inherited from OneHotLabelEncoder.
-     source: https://github.com/alvinthai/custom_preprocessors/blob/master/encoders/OneHotLabelEncoder.py
+    Class inherited from OneHotLabelEncoder from the follwing repo:
+     https://github.com/alvinthai/custom_preprocessors/
     '''
     def __init__(self, labels=None):
         super(OneHotLabelGrouper, self).__init__(labels=labels)
