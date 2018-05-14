@@ -2,7 +2,7 @@ from collections import defaultdict
 from encoders.OneHotLabelEncoder import OneHotLabelEncoder
 from iml.links import IdentityLink
 from IPython.display import display
-from OrderedOVRClassifier.classifier import OrderedOVRClassifier
+from BaseClassifier import BaseClassifier
 
 import json
 import numpy as np
@@ -77,7 +77,7 @@ class OneHotLabelGrouper(OneHotLabelEncoder):
         return self
 
 
-class BaseballPitchClassifier(OrderedOVRClassifier):
+class BaseballPitchClassifier(BaseClassifier):
     '''
     Custom API that extends sklearn classifications with:
      - Automatic one hot encoding of categorical features
@@ -88,33 +88,28 @@ class BaseballPitchClassifier(OrderedOVRClassifier):
     More info on shap library:
      source: https://github.com/slundberg/shap
      research paper: https://arxiv.org/pdf/1705.07874.pdf
-
-    Class inherited from OrderedOVRClassifier.
-     source: https://github.com/alvinthai/OrderedOVRClassifier
     '''
     def __init__(self, target=None, model=None, model_fit_params=None,
                  categorical_cols=None):
         self._ohlg = OneHotLabelGrouper(categorical_cols)
-        model_dict = {'final': model}
-        model_fit_params = {'final': model_fit_params}
 
         init = super(BaseballPitchClassifier, self).__init__
-        init(target, model_dict=model_dict, model_fit_params=model_fit_params)
+        init(target, model=model, model_fit_params=model_fit_params)
 
     def _create_shap_kernal(self, class_idx, link):
         data = self._ohlg.baseline_df.values.reshape(1, -1)
         group_names = self._ohlg.colnames.tolist()
         feature_groups = self._ohlg.feature_groups
         data_median = shap.DenseData(data, group_names, feature_groups)
-        f = lambda x: self.pipeline[-1][1].predict_proba(x)[:, class_idx]
+        f = lambda x: self.model.predict_proba(x)[:, class_idx]
         explainer = shap.KernelExplainer(f, data_median, link, nsamples=1000)
 
         return explainer
 
-    def _eval_set(self, eval_set, drop_cols):
+    def _eval_set(self, eval_set):
         es = super(BaseballPitchClassifier, self)._eval_set
 
-        eval_set = es(eval_set, drop_cols)
+        eval_set = es(eval_set)
         eval_set = [(self._ohlg.transform(eval_set[0][0]), eval_set[0][1])]
 
         return eval_set
@@ -128,14 +123,9 @@ class BaseballPitchClassifier(OrderedOVRClassifier):
             row = pd.Series(json.loads(X), index=self.columns)
             return pd.DataFrame(row).T.convert_objects(convert_numeric=True)
 
-    def _pred_cleanup(self, X, drop_cols, return_raw=False):
-        if drop_cols is None:
-            drop_cols = []
-
+    def _pred_cleanup(self, X, return_raw=False):
         if self.target in X.columns:
-            drop_cols.append(self.target)
-
-        X = X.drop(drop_cols, axis=1)
+            X = X.drop(self.target, axis=1)
 
         if len(X.columns) == len(self._ohlg.colnames):
             if all(X.columns == self._ohlg.colnames):
@@ -151,34 +141,35 @@ class BaseballPitchClassifier(OrderedOVRClassifier):
         else:
             return Xt
 
-    def _xy_transform(self, X, y, drop_cols=None):
+    def _xy_transform(self, X, y):
         xy_tf = super(BaseballPitchClassifier, self)._xy_transform
-        X, y, drop_cols = xy_tf(X, y, drop_cols)
+        X, y = xy_tf(X, y)
 
         if not self._ohlg.fitted:
             X = self._ohlg.fit_transform(X)
         else:
             X = self._ohlg.transform(X)
 
-        return X, y, drop_cols
+        return X, y
 
     def fit(self, X, y=None, eval_set=None):
         self._ohlg.fitted = False
-        return super(BaseballPitchClassifier, self).fit(X, y, eval_set,
-                                                        train_final_only=True)
+        return super(BaseballPitchClassifier, self).fit(X, y, eval_set)
 
     def predict(self, X):
         X = self._input_cleanup(X)
+        X = self._pred_cleanup(X)
         return super(BaseballPitchClassifier, self).predict(X)
 
     def predict_proba(self, X):
         X = self._input_cleanup(X)
+        X = self._pred_cleanup(X)
         return super(BaseballPitchClassifier, self).predict_proba(X)
 
     def predict_explain_one(self, X, explain_class=None, link=IdentityLink(),
                             explainer=None, detail=True):
         X = self._input_cleanup(X)
-        Xt, X = self._pred_cleanup(X, None, return_raw=True)
+        Xt, X = self._pred_cleanup(X, return_raw=True)
 
         if explainer is None:
             if explain_class is not None:

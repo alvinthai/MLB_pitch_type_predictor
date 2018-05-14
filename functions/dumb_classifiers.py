@@ -1,23 +1,34 @@
-from sklearn.base import BaseEstimator, ClassifierMixin
 import numpy as np
-import OrderedOVRClassifier.oovr_utils as utils
+from sklearn.base import BaseEstimator, ClassifierMixin
+from BaseClassifier import extended_classification_report
 
 
-class UniformClassifier(utils.UniformClassifier):
+class UniformClassifier(BaseEstimator, ClassifierMixin):
     '''
-    Classifier that always predicts the same value.
+    Dumb classifier that predicts the same value for all predictions.
 
-    Class inherited from UniformClassifier.
-     source: https://github.com/alvinthai/OrderedOVRClassifier/blob/master/OrderedOVRClassifier/oovr_utils.py
+    Parameters
+    ----------
+    val: str or numeric
+        Value to return in predictions.
     '''
     def __init__(self, val):
         self.val = val
+
+    def fit(self, X=None, y=None):
+        return self
+
+    def predict(self, X):
+        return np.full(len(X), self.val)
+
+    def predict_proba(self, X):
+        return np.ones(len(X)).reshape(-1, 1)
 
     def multiclassification_report(self, X):
         y_true = X.loc[:, 'pitch_type']
         y_pred = self.predict(X)
 
-        return utils.extended_classification_report(y_true, y_pred)
+        return extended_classification_report(y_true, y_pred)
 
 
 class BaselineClassifier(BaseEstimator, ClassifierMixin):
@@ -53,4 +64,4 @@ class BaselineClassifier(BaseEstimator, ClassifierMixin):
         y_true = X['pitch_type']
         y_pred = self.predict(X)
 
-        return utils.extended_classification_report(y_true, y_pred)
+        return extended_classification_report(y_true, y_pred)
