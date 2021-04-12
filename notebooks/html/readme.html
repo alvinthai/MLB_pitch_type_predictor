@@ -12069,13 +12069,13 @@ More info on shap library:<br>
 <p>A quick primer on Shapley values, as summarized by <a href="https://clearcode.cc/blog/game-theory-attribution/">Michael Sweeney</a>. Imagine playing a card game where \$19 is won when 3 players are contributing, and ≤ \$19 is won when a different combination of players are involved.</p>
 <ol>
 <li>You first start by identifying each player’s contribution when they play individually, when 2 play together, and when all 3 play together.
-<img src='https://cdn.clearcode.cc/2016/11/ABC-wide.png' width="800"></li>
+<img src='https://clearcode.cc/wp-content/uploads/2016/11/ABC-wide.png?ver=1478561348' width="800"></li>
 <li>Then, you need to consider all possible orders and calculate their marginal value – e.g. what value does each player add when player A enters the game first, followed by player B, and then player C. Below are the 6 possible orders and the marginal value each player adds in the different combinations:
-<img src='https://cdn.clearcode.cc/2016/11/ABC-updated.png' width="800"></li>
+<img src='https://clearcode.cc/wp-content/uploads/2016/11/ABC-updated.png?ver=1479258642' width="800"></li>
 <li>Now that we have calculated each player’s marginal value across all 6 possible order combinations, we now need to add them up and work out the Shapley value (i.e. the average) for each player.
-<img src='https://cdn.clearcode.cc/2016/11/counting-01.png' width="500">
-<img src='https://cdn.clearcode.cc/2016/11/counting-B-01.png' width="500">
-<img src='https://cdn.clearcode.cc/2016/11/counting-C.png' width="500"></li>
+<img src='https://clearcode.cc/wp-content/uploads/2016/11/counting-01.png?ver=1479260944' width="500">
+<img src='https://clearcode.cc/wp-content/uploads/2016/11/counting-B-01.png?ver=1478496972' width="500">
+<img src='https://clearcode.cc/wp-content/uploads/2016/11/counting-C.png?ver=1478497016' width="500"></li>
 <li>Now that we have worked out the Shapley value for each player, we can clearly see the true contribution each player made to the game and assign credit fairly. In this example, player C contributed the most, followed by A, then by B.</li>
 </ol>
 <p><code>______________________________________________________________________</code></p>
